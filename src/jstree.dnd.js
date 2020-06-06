@@ -248,7 +248,13 @@
 					else {
 						// if we are hovering a tree node
 						ref = ins.settings.dnd.large_drop_target ? $(data.event.target).closest('.jstree-node').children('.jstree-anchor') : $(data.event.target).closest('.jstree-anchor');
-						if(ref && ref.length && ref.parent().is('.jstree-closed, .jstree-open, .jstree-leaf')) {
+            // ルートノードへのドロップも許可する。
+            if(ref.length <= 0) {
+              ref = $(data.event.target).closest('.jstree');
+              // 以下のソースコードでins.get_node(ref.parent())で指定先ノードを取得できることを期待しているので、ハック。
+              if(ref.length > 0) { ref.parent = function() { return '#'; }; }
+            }
+						if(ref && ref.length && (ref.parent() === '#' || ref.parent().is('.jstree-closed, .jstree-open, .jstree-leaf'))) {
 							off = ref.offset();
 							rel = (data.event.pageY !== undefined ? data.event.pageY : data.event.originalEvent.pageY) - off.top;
 							h = ref.outerHeight();
@@ -283,7 +289,7 @@
 										break;
 									}
 								}
-								if(v === 'i' && ref.parent().is('.jstree-closed') && ins.settings.dnd.open_timeout) {
+								if(v === 'i' && ref.parent() !== '#' && ref.parent().is('.jstree-closed') && ins.settings.dnd.open_timeout) {
 									if (!data.event || data.event.type !== 'dragover' || isDifferentNode) {
 										if (opento) { clearTimeout(opento); }
 										opento = setTimeout((function (x, z) { return function () { x.open_node(z); }; }(ins, ref)), ins.settings.dnd.open_timeout);
