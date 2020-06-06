@@ -252,24 +252,9 @@
 							off = ref.offset();
 							rel = (data.event.pageY !== undefined ? data.event.pageY : data.event.originalEvent.pageY) - off.top;
 							h = ref.outerHeight();
-							if(rel < h / 3) {
-								o = ['b', 'i', 'a'];
-							}
-							else if(rel > h - h / 3) {
-								o = ['a', 'i', 'b'];
-							}
-							else {
-								o = rel > h / 2 ? ['i', 'a', 'b'] : ['i', 'b', 'a'];
-							}
+              o = rel > h / 2 ? ['i', 'a', 'b'] : ['i', 'b', 'a'];
 							$.each(o, function (j, v) {
 								switch(v) {
-									case 'b':
-										l = off.left - 6;
-										t = off.top;
-										p = ins.get_parent(ref);
-										i = ref.parent().index();
-										c = 'jstree-below';
-										break;
 									case 'i':
 										ip = ins.settings.dnd.inside_pos;
 										tm = ins.get_node(ref.parent());
@@ -278,13 +263,6 @@
 										p = tm.id;
 										i = ip === 'first' ? 0 : (ip === 'last' ? tm.children.length : Math.min(ip, tm.children.length));
 										c = 'jstree-inside';
-										break;
-									case 'a':
-										l = off.left - 6;
-										t = off.top + h;
-										p = ins.get_parent(ref);
-										i = ref.parent().index() + 1;
-										c = 'jstree-above';
 										break;
 								}
 								ok = true;
@@ -297,7 +275,9 @@
 											ps -= 1;
 										}
 									}
-									ok = ok && ( (ins && ins.settings && ins.settings.dnd && ins.settings.dnd.check_while_dragging === false) || ins.check(op, (data.data.origin && data.data.origin !== ins ? data.data.origin.get_node(data.data.nodes[t1]) : data.data.nodes[t1]), p, ps, { 'dnd' : true, 'ref' : ins.get_node(ref.parent()), 'pos' : v, 'origin' : data.data.origin, 'is_multi' : (data.data.origin && data.data.origin !== ins), 'is_foreign' : (!data.data.origin) }) );
+                  ok = ok && ( (ins && ins.settings && ins.settings.dnd && ins.settings.dnd.check_while_dragging === false) || ins.check(op, (data.data.origin && data.data.origin !== ins ? data.data.origin.get_node(data.data.nodes[t1]) : data.data.nodes[t1]), p, ps, { 'dnd' : true, 'ref' : ins.get_node(ref.parent()), 'pos' : v, 'origin' : data.data.origin, 'is_multi' : (data.data.origin && data.data.origin !== ins), 'is_foreign' : (!data.data.origin) }) );
+                  var node = ins.get_node(data.data.nodes[t1]);
+                  ok = ok && node.parent !== p;
 									if(!ok) {
 										if(ins && ins.last_error) { laster = ins.last_error(); }
 										break;
