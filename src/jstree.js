@@ -84,7 +84,7 @@
 		idregex : /[\\:&!^|()\[\]<>@*'+~#";.,=\- \/${}%?`]/g,
 		root : '#'
 	};
-	
+
 	/**
 	 * creates a jstree instance
 	 * @name $.jstree.create(el [, options])
@@ -892,13 +892,21 @@
 						this._data.core.themes.ellipsis		= s.ellipsis;
 						this.set_theme(s.name || "default", s.url);
 						this.set_theme_variant(s.variant);
-					}, this))
+          }, this))
 				.on("loading.jstree", $.proxy(function () {
 						this[ this._data.core.themes.dots ? "show_dots" : "hide_dots" ]();
 						this[ this._data.core.themes.icons ? "show_icons" : "hide_icons" ]();
 						this[ this._data.core.themes.stripes ? "show_stripes" : "hide_stripes" ]();
 						this[ this._data.core.themes.ellipsis ? "show_ellipsis" : "hide_ellipsis" ]();
-					}, this))
+          }, this))
+        .on("redraw.jstree", $.proxy(function () {
+            // min-heightつけてドロップ用の幅を確保したり、右クリックの対象にしたりするためのdiv。
+            var $rootMargin =  $('<div class="jstree-root-margin"></div>');
+            $rootMargin.appendTo(this.element);
+            $rootMargin.on('pointerdown', $.proxy(function () {
+              this.clickedRootMargin = true;
+            }, this));
+          }, this))
 				.on('blur.jstree', '.jstree-anchor', $.proxy(function (e) {
 						this._data.core.focused = null;
 						$(e.currentTarget).filter('.jstree-hovered').trigger('mouseleave');
@@ -912,11 +920,16 @@
 						this.element.find('.jstree-hovered').not(e.currentTarget).trigger('mouseleave');
 						$(e.currentTarget).trigger('mouseenter');
 						this.element.attr('tabindex', '-1');
-					}, this))
+          }, this))
 				.on('focus.jstree', $.proxy(function () {
+            if(this.clickedRootMargin) {
+              this.clickedRootMargin = false;
+              $(this.element).blur();
+              return;
+            }
 						if(+(new Date()) - was_click > 500 && !this._data.core.focused && this.settings.core.restore_focus) {
 							was_click = 0;
-							var act = this.get_node(this.element.attr('aria-activedescendant'), true);
+              var act = this.get_node(this.element.attr('aria-activedescendant'), true);
 							if(act) {
 								act.find('> .jstree-anchor').focus();
 							}
