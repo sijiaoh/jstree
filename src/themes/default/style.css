@@ -1,4 +1,11 @@
 /* jsTree default theme */
+.jstree {
+  display: flex;
+  flex-direction: column;
+}
+.jstree-root-margin {
+  flex: 1;
+}
 .jstree-node,
 .jstree-children,
 .jstree-container-ul {
